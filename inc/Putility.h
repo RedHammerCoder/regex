@@ -20,7 +20,7 @@ bool IsNum(char chr)
     return chr>='0'&&chr<='9'?true:false;
 
 }
-bool IsChr(char chr){
+bool IsChar(char chr){
     return IsAlpha(chr)||IsNum(chr);
 }
 

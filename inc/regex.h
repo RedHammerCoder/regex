@@ -6,8 +6,9 @@
 #include <set>
 #include <map>
 #include "ExpGraph.h"
+#include "Putility.h"
 
-#define UDF pritf("current not support")
+#define UDF printf("current not support")
 
 using STRINGS = std::vector<std::string>;
 
@@ -22,6 +23,7 @@ enum {
 class regex
 {
 private:
+    bool bEOF;
     bool trans;
     ExpGraph * head;//头结点
     ExpGraph * tail;

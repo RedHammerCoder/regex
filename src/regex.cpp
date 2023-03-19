@@ -2,102 +2,114 @@
 #include <iostream>
 #include <random>
 #include <utility>
-regex::regex(std::string  ss):form(std::move(ss))
+regex::regex(std::string ss) : form(std::move(ss)), bEOF(false)
 {
-    trans=false;
-    if(ss.size()==0)
+    trans = false;
+    if (ss.size() == 0)
     {
-        this->head==nullptr;
+        this->head == nullptr;
         return;
     }
-    this->cursor=0;
-    
+    this->cursor = 0;
 }
 
 char regex::GetNextSym()
 {
-    if(cursor<=this->form.size())
+    if (cursor <= this->form.size())
     {
         return form[cursor++];
     }
-
 }
 
-ExpGraph* regex::ParserNextOne()
+ExpGraph *regex::ParserNextOne()
 {
-    ExpGraph  * ret=nullptr;
+ReExec:
+    ExpGraph *ret = nullptr;
     int L = this->CurrentLevel;
+
     switch (GetNextSym())
     {
+    case ('\0'):
+        bEOF = true;
+        return;
+
+    case ('|'):
+        // TODO:实现getlast元素和当前level相同
+        //
+
     case ('\\'):
         char tab = GetNextSym();
         ret = new ExpGraph(SPEC_SYM);
         ret->SetLevel(this->CurrentLevel);
-        ret->SetChr(GetNextSym());
-        return ret;
+        ret->SetChr(tab);
+        tail->AddNext(ret);
+        tail = ret;
+        ParserNextOne();
+        break;
+    case ('*'):
+    // * 用于处理上一个结点 实现上一个节点的重复 使用层级难以区分 所以特此修改
+        // get last same level node  and add a next pointer to it self
+        break;
+    case ('+'):
+        ExpGraph *lastnode = GetLastNodeWithlevel(CurrentLevel);
+        // get last same level node  and add a next pointer to it self
         break;
     case ('('):
-    ret =  new ExpGraph(SUB_EXPRESS);
-    ret->SetLevel(L);
-    this->CurrentLevel+=1;
-    ret->AddNext(ParserNextOne());
-    return ret;
-        break;
-
-
-    case ('.')://缺少非贪婪控制 需要后续修改
+        this->CurrentLevel += 1;
+        goto ReExec;
+    case ('.'): // 缺少非贪婪控制 需要后续修改
         char cr = GetNextSym();
-        ret=new ExpGraph(Dot);
-        if(cr=='*' || cr=='+' )
-        {
-            ret->AddNext(ret);
-        }
-
-        RollBack();
+        ret = new ExpGraph(Dot);
         break;
-
 
     case ('['):
-    // TODO 在ExpGraph中间添加对 sym——scopt 范围的 支持
-    UDF;
+        // TODO 在ExpGraph中间添加对 sym——scopt 范围的 支持
+        UDF;
         break;
-
-
-    case (')'):// 不应该存在
-    this->CurrentLevel-=1;
+    case (')'): // 不应该存在
+        this->CurrentLevel -= 1;
+        goto ReExec;
         break;
     default:
         // 控制字符以及非普通字符已经在前面被处理掉了
         // 需要判断剩下的字符是否仅有
+        char sym = GetNextSym();
+        if (IsChar(sym))
+        {
+            ret = new ExpGraph(CHR);
+            ret->SetChr(sym);
 
-
-        break;
+            break;
+        }
+        return ret;
     }
-}
 
-
-ExpGraph* regex::GetLastNodeWithlevel(int level )
-{
-    
-}
-
-
-
-void regex::Parser()
-{
-    if(this->form.size()==0)
+    ExpGraph *regex::GetLastNodeWithlevel(int level)
     {
-        this->head=NULL;
-        this->tail=NULL;
-        return;
+        //     0    1       1    0
+        //   node (avx(manue)|(hellow）)*  avxhellowavxavx
+        //（（avx(manue)|(hellow）*)  avxhellowavxavx
+        /**TODO
+         * 从avx 结点
+        */
+        // (avx*)   avxxxx
+
     }
-    this->head=new ExpGraph(HEAD);
-    this->tail=this->head;
 
+    void regex::Parser()
+    {
+        if (this->form.size() == 0)
+        {
+            this->head = NULL;
+            this->tail = NULL;
+            return;
+        }
+        this->head = new ExpGraph(HEAD);
+        this->tail = this->head;
+        this->CurrentLevel = 0;
+        head->AddNext(ParserNextOne());
 
-
-
-    #if 0
+#if 0
     if(tail==NULL)return;
     switch (GetNextSym())
     {
@@ -135,8 +147,7 @@ void regex::Parser()
     default:
     //控制字符以及非普通字符已经在前面被处理掉了
         break;
-    } 
+    }
 
-
-    #endif
-}
+#endif
+    }
