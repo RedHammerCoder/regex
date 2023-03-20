@@ -6,7 +6,7 @@ void ExpGraph::SetLevel(int T)
 
 ExpGraph::ExpGraph(ExpType T):Type(T),Stat(NonStat)
 {
-    if(Type==Bucket)
+    if(Type==BUCKET)
     {
         this->nodetype =Bucket;
     }

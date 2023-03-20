@@ -3,7 +3,7 @@
 
 inline bool IsAlpha(char cr)
 {
-    ((cr>='a' && cr<='z')||(cr>='A'&& cr<='Z'))?true :false;
+    return ((cr>='a' && cr<='z')||(cr>='A'&& cr<='Z'))?true :false;
 }
  inline bool IsNum(char chr)
 {

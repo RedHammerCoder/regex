@@ -10,6 +10,8 @@ regex::regex(std::string ss) : form(std::move(ss)), bEOF(false)
         return;
     }
     this->cursor = 0;
+    Parser();
+
 }
 
 char regex::GetNextSym()
@@ -54,6 +56,7 @@ ReExec:
             assert(lastone->nodetype == Divide);
             lastone->AddDivNext(Tmp);
         }
+        return ParserNextOne(   );
         break;
     }
 
@@ -64,7 +67,7 @@ ReExec:
         ret->SetLevel(this->CurrentLevel);
         ret->SetChr(tab);
 
-        ParserNextOne();
+        return ParserNextOne();
         break;
     }
 
@@ -83,16 +86,20 @@ ReExec:
     case '(':
     {
         ExpGraph *Lnode = new ExpGraph(BUCKET);
+        Lnode->Parent=CurNode;
         CurNode->AddBucketNext(Lnode);
         CurNode = Lnode;
         this->CurrentLevel += 1;
-        return Lnode;
+
+        return ParserNextOne();
+        
     }
     case '.': // 缺少非贪婪控制 需要后续修改
     {
         char cr = GetNextSym();
-        ret = new ExpGraph(Dot);
-        break;
+        auto T = new ExpGraph(Dot);
+        CurNode->AddBucketNext(T);
+        return ParserNextOne();
     }
     case '[':
         // TODO 在ExpGraph中间添加对 sym——scopt 范围的 支持
@@ -105,17 +112,17 @@ ReExec:
     {
         this->CurrentLevel -= 1;
         CurNode = CurNode->Parent;
-        goto ReExec;
-        break;
+        return ParserNextOne();
     }
 
     default:
     {
         if (IsChar(flag))
         {
-            ret = new ExpGraph(CHR);
-            ret->SetChr(flag);
-            CurNode->AddBucketNext(ret);
+            auto chr = new ExpGraph(CHR);
+            chr->SetChr(flag);
+            CurNode->AddBucketNext(chr);
+            ret= ParserNextOne();
 
             break;
         }
@@ -136,6 +143,7 @@ void regex::Parser()
     this->CurrentLevel = 0;
     CurNode->node.Bucket.SubnodeHead = nullptr;
     CurNode->node.Bucket.tail = nullptr;
+    ParserNextOne();
 
 #if 0
     if(tail==NULL)return;

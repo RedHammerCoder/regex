@@ -110,7 +110,8 @@ public:
     bool HavePerfixSym(char T)
     {
         auto ishave = this->PerfixSym.find(T);
-        ishave == this->PerfixSym.end() ? false : true;
+        return ( ishave == this->PerfixSym.end()) ? false : true;
+        
     }
 
     void SetStat(NodeStat);
