@@ -6,6 +6,15 @@ void ExpGraph::SetLevel(int T)
 
 ExpGraph::ExpGraph(ExpType T):Type(T),Stat(NonStat)
 {
+    if(Type==Bucket)
+    {
+        this->nodetype =Bucket;
+    }
+    if(Type==FELLOWCTRL)
+    {
+        this->nodetype=Divide;
+    }
+
 
 }
 

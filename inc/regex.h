@@ -24,15 +24,15 @@ class regex
 {
 private:
     bool bEOF;
+    void NFA2DFA();
+    void DFAmini();
     bool trans;
-    ExpGraph * head;//头结点
-    ExpGraph * tail;
+    ExpGraph * CurNode;
     std::string form;
     char GetNextSym();
     int cursor;
     void Parser();
     int CurrentLevel;
-    ExpGraph* GetLastNodeWithlevel(int );
     ExpGraph* ParserNextOne();
     void RollBack()
     {
@@ -43,9 +43,16 @@ public:
     regex(std::string );
     //用于根据参数转换 NFA
     bool init(std::string);
-    ~regex();
-    STRINGS matchs(char* );
-    STRINGS matchs(std::string);  
+    ~regex(){}
+    STRINGS matchs(char* chr)
+    {
+        std::vector<std::string> ss;
+        return ss;
+    }
+    STRINGS matchs(std::string ss)
+    {
+        return matchs(ss.c_str());
+    }
 };
 int64_t ERROR;
 
