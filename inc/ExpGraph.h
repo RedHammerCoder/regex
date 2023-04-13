@@ -1,10 +1,12 @@
 #ifndef __EXPGRAPH__
 #define __EXPGRAPH__
 #include <vector>
+#include "../inc/bitset.h"
 #include <functional>
 #include <set>
 #include <assert.h>
 #include <array>
+
 class ExpGraph;
 #define LeftMove(x)  0x00000001<<(x)
 enum ExpType
@@ -16,6 +18,7 @@ enum ExpType
     BUCKET = LeftMove(4), // 不一定有用 先行占位
     Dot = LeftMove(5),         //'.' 符号 用于通配         一个字符
     SCOPE = LeftMove(6),       // 范围 用于添加范围输入
+    Tail = LeftMove(7),
 };
 enum NodeStat
 {
@@ -28,6 +31,7 @@ enum NodeType
     Bucket,
     Divide,
     UnDef,
+    Scope,
 };
 
 struct NodeBucket
@@ -35,6 +39,7 @@ struct NodeBucket
     ExpGraph* SubnodeHead;
     ExpGraph* tail;
 };
+
 
 struct NodeDivide
 {
@@ -51,14 +56,19 @@ union NODE
 class ExpGraph
 {
     friend class ExpGraph;
+    friend class regex;
 
 public:
     NodeStat Stat;
+    // union {
+    //     BitSet BS;
+
+    // } CT;
     
     ExpGraph * Next; //
     ExpGraph * Perfix;
     std::set<char> PerfixSym; //前置node 收到内部符号则跳转到本地
-    
+    BitSet AsciiScope;
     NodeType nodetype;
     
     int _level; // 用于子表达式的分级支持
@@ -66,14 +76,27 @@ public:
     char Content;
 
     int32_t LoopStat;
-    int mini ; //范围控制mini
-    int max;// 范围控制max
+    // face to * ? . etc operator 
+enum LOOPTYPE {
+    START=0,
+    ADDS,
+    SCOPE,
+    DOT,
+
+};
+
+    struct {
+        int mini;
+        int max;
+        LOOPTYPE LoopType;
+    } Scope ;
 
 public:
     NODE node;
     ExpGraph * Parent;//用于指向父结点
      void AddNext(ExpGraph * next)
     {
+        assert(next!=nullptr);
         next->Perfix=this;
         Next=next;
         
@@ -82,7 +105,8 @@ public:
     void AddDivNext(ExpGraph* subnext)
     {
         assert(this->nodetype==Divide);
-        node.Div.List[node.Div.List.size()]=subnext;
+        // node.Div.List[node.Div.List.size()]=subnext;
+        node.Div.List.fill(subnext);
         subnext->AddNext(this);
 
     }

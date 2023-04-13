@@ -8,7 +8,7 @@
 #include "ExpGraph.h"
 #include "Putility.h"
 
-#define UDF printf("current not support")
+#define UDF printf("current not support\n")
 
 using STRINGS = std::vector<std::string>;
 

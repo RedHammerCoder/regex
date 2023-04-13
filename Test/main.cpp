@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 int main(){
-    regex REG( std::string("(reg|malloc)axy"));
+    regex REG( std::string("((reg)|(aredh)|(ll)oc)axy"));
     std::cout<<"parser"<<std::endl;
     
     // auto T = REG.matchs("09434asdeaxy");

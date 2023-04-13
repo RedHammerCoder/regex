@@ -2,13 +2,12 @@ src := ./src/*.cpp
 inc := ./inc/*.h
 
 REGEX : src inc
-	clang++ -g ${src} -shared -fPIC -o libregex.so
-	clang++ -g -m64 -c ${src}  
+	clang++ -g -m64 -c -Werror ${src}  
 	ar rsc  libregex.a  ./*.o 
 	# mv regex.o rn_regex.o
 
-install : REGEX
-	-sudo cp ./libregex.so  /lib/
+# install : REGEX
+# 	-sudo cp ./libregex.so  /lib/
 
 
 
@@ -19,5 +18,6 @@ clean :
 	-sudo  rm libregex.so /lib/libregex.so  ./*.o  ./*.a
 
 
-main :  install
-	clang++ -g -o main Test/main.cpp  -static -L. -lregex
+main :  REGEX
+	# clang++ -g -o main Test/main.cpp  -static -L. -lregex
+	clang++ -g -o main Test/main.cpp  ./*.o
