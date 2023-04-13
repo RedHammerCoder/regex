@@ -54,7 +54,6 @@ public:
         return matchs(ss.c_str());
     }
 };
-int64_t ERROR;
 
 
 #endif

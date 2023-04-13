@@ -4,8 +4,9 @@
 #include <utility>
 regex::regex(std::string ss) : form(std::move(ss)), bEOF(false)
 {
+    std::cout<<form<<std::endl;
     trans = false;
-    if (ss.size() == 0)
+    if (form.size() == 0)
     {
         return;
     }
