@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <array>
 extern std::array<char , 256> EscapCharMap;
 struct BitSet {
     private: 
